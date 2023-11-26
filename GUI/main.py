@@ -13,11 +13,11 @@ layout3 = input_page.get_input_layout()
 
 # ----------- Create actual layout using Columns and a row of Buttons
 layout = [
-    [sg.Column(
-        [[sg.Button('Home', key="1"),
-          sg.Button('Image-Page', key="2"),
-          sg.Button('Input-Page', key="3"),
-          sg.Button('Exit')]], key='-BUTTONS-', vertical_alignment='top', justification='center')],
+    [sg.Column([[
+        sg.Button('Exit'),
+        sg.Button('Back', key='-BACK-'),
+        sg.Button('Next', key="-NEXT-")]],
+        key='-BUTTONS-', vertical_alignment='bottom', justification='center')],
     [sg.Column(layout1, visible=True, key='-COL1-', vertical_alignment='center', justification='center'),
      sg.Column(layout2, visible=False, key='-COL2-', vertical_alignment='center', justification='center'),
      sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center')],
@@ -30,27 +30,34 @@ window.maximize()
 # home.windowUpdate(window)
 
 def main():
+    maxPages = 3
     page = 1  # The currently visible layout
     while True:
         event, values = window.read()
-        print(event)
+        print("PAGE: " + str(page))
         if event in (None, 'Exit'):
             break
         if event == sg.WIN_CLOSED:
             break
 
-        if event == "1":
-            window[f'-COL{page}-'].update(visible=False)
-            page = 1
-            window[f'-COL{page}-'].update(visible=True)
-        elif event == "2":
-            window[f'-COL{page}-'].update(visible=False)
-            page = 2
-            window[f'-COL{page}-'].update(visible=True)
-        elif event == "3":
-            window[f'-COL{page}-'].update(visible=False)
-            page = 3
-            window[f'-COL{page}-'].update(visible=True)
+        if event == "-BACK-":
+            if page > 1:
+                window[f'-NEXT-'].update(visible=True)
+                window[f'-BACK-'].update(visible=True)
+                window[f'-COL{page}-'].update(visible=False)
+                page -= 1
+                window[f'-COL{page}-'].update(visible=True)
+            else:
+                window[f'-BACK-'].update(visible=False)
+        elif event == "-NEXT-":
+            if page < maxPages:
+                window[f'-NEXT-'].update(visible=True)
+                window[f'-BACK-'].update(visible=True)
+                window[f'-COL{page}-'].update(visible=False)
+                page += 1
+                window[f'-COL{page}-'].update(visible=True)
+            else:
+                window[f'-NEXT-'].update(visible=False)
 
         if event == "-FOLDER-":
             folder = values["-FOLDER-"]
@@ -85,7 +92,7 @@ def main():
         if event == "Calculate":
             num_students = int(values['-NUM_STUDENTS-'])
             num_exemptions = int(values['-NUM_EXEMPTIONS-'])
-            total_student = num_students-num_exemptions
+            total_student = num_students - num_exemptions
             print("Total Number Of Students In Class: " + str(total_student))
 
     window.close()
