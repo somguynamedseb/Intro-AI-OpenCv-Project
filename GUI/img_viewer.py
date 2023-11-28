@@ -5,8 +5,6 @@ import os.path
 import home
 import input_page
 
-s = 1000
-
 
 def img_viewer_layout():
     file_list_column = [
@@ -28,6 +26,8 @@ def img_viewer_layout():
     column_to_be_centered = [
         [sg.Column(file_list_column), sg.VSeperator(),
          sg.Column(image_viewer_column)],
-        [sg.Button("OK", font=('Helvetica', 15), size=10)]
+        [sg.Button("Reset", font=('Helvetica', 15), size=10, key="-RESET-")],
+        [sg.Button("Add", font=('Helvetica', 15), size=10, key="-ADD-", visible=False)],
+        [sg.Button("Stitch", font=('Helvetica', 15), size=10, key="-STITCH-", visible=False)],
     ]
     return [[sg.Column(column_to_be_centered, vertical_alignment='center', justification='center')]]

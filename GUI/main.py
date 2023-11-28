@@ -11,6 +11,10 @@ layout2 = img_viewer.img_viewer_layout()
 
 layout3 = input_page.get_input_layout()
 
+stitchImgs = []
+
+imgClicked = ""
+
 # ----------- Create actual layout using Columns and a row of Buttons
 layout = [
     [sg.Column([[
@@ -31,6 +35,7 @@ window.maximize()
 # home.windowUpdate(window)
 
 def main():
+    global imgClicked
     maxPages = 3
     page = 1  # The currently visible layout
     while True:
@@ -84,15 +89,29 @@ def main():
                 )
                 window["-TOUT-"].update(filename)
                 window["-IMAGE-"].update(filename=filename)
+                window[f'-ADD-'].update(visible=True)
+                imgClicked = filename
             except:
                 pass
-        elif event == "OK":
+        elif event == "-RESET-":
             window["-FILE LIST-"].update([])
             window["-TOUT-"].update("")
             window["-IMAGE-"].update(filename="")
             window["-FOLDER-"].update("")
+            window[f'-ADD-'].update(visible=False)
+            window[f'-STITCH-'].update(visible=False)
+            stitchImgs.clear()
+        elif event == "-ADD-":
+            s = stitchImgs.__len__()
+            stitchImgs.insert(s, imgClicked)
+            window[f'-STITCH-'].update(visible=True)
+            print(stitchImgs)
+        elif event == "-STITCH-":
+            pass
+        else:
+            pass
 
-        if event == "Calculate":
+        if event == "-CALCULATE-":
             num_students = int(values['-NUM_STUDENTS-'])
             num_exemptions = int(values['-NUM_EXEMPTIONS-'])
             total_student = num_students - num_exemptions
