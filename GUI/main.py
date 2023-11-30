@@ -17,10 +17,10 @@ imgClicked = ""
 
 # ----------- Create actual layout using Columns and a row of Buttons
 layout = [
+    [sg.Button('Exit', font=('Helvetica', 15), size=10)],
     [sg.Column([[
-        sg.Button('Exit'),
-        sg.Button('Back', key='-BACK-'),
-        sg.Button('Next', key="-NEXT-")]],
+        sg.Button('Back', key='-BACK-', font=('Helvetica', 15), size=10),
+        sg.Button('Next', key="-NEXT-", font=('Helvetica', 15), size=10)]],
         key='-BUTTONS-', vertical_alignment='bottom', justification='center')],
     [sg.Column([[sg.Text("", size=(0, 5))]], vertical_alignment='center', justification='center')],
     [sg.Column(layout1, visible=True, key='-COL1-', vertical_alignment='center', justification='center'),
@@ -28,7 +28,7 @@ layout = [
      sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center')],
 ]
 
-window = sg.Window('Swapping the contents of a window', layout, finalize=True)
+window = sg.Window('Attendance-AI', layout, finalize=True)
 window.maximize()
 
 
@@ -38,6 +38,7 @@ def main():
     global imgClicked
     maxPages = 3
     page = 1  # The currently visible layout
+    window[f'-BACK-'].update(visible=False)
     while True:
         event, values = window.read()
         # print("PAGE: " + str(page))
@@ -48,25 +49,22 @@ def main():
 
         if event == "-BACK-":
             if page > 1:
-                window[f'-NEXT-'].update(visible=True)
                 window[f'-BACK-'].update(visible=True)
+                window[f'-NEXT-'].update(visible=True)
                 window[f'-COL{page}-'].update(visible=False)
                 page -= 1
+                if page == 1:
+                    window[f'-BACK-'].update(visible=False)
                 window[f'-COL{page}-'].update(visible=True)
-            else:
-                pass
-                # window[f'-BACK-'].update(visible=False)
         elif event == "-NEXT-":
-            if page < maxPages:
-                window[f'-NEXT-'].update(visible=True)
+            if 0 < page < maxPages:
                 window[f'-BACK-'].update(visible=True)
                 window[f'-COL{page}-'].update(visible=False)
                 page += 1
+                if page == maxPages:
+                    window[f'-NEXT-'].update(visible=False)
                 window[f'-COL{page}-'].update(visible=True)
-            else:
-                pass
-                # window[f'-NEXT-'].update(visible=False)
-
+                window[f'-NEXT-'].update(visible=False)
         if event == "-FOLDER-":
             folder = values["-FOLDER-"]
             try:
@@ -100,6 +98,7 @@ def main():
             window["-FOLDER-"].update("")
             window[f'-ADD-'].update(visible=False)
             window[f'-STITCH-'].update(visible=False)
+            window[f'-NEXT-'].update(visible=False)
             stitchImgs.clear()
         elif event == "-ADD-":
             s = stitchImgs.__len__()
@@ -107,6 +106,7 @@ def main():
             window[f'-STITCH-'].update(visible=True)
             print(stitchImgs)
         elif event == "-STITCH-":
+            window[f'-NEXT-'].update(visible=True)
             pass
         else:
             pass
