@@ -1,8 +1,10 @@
-import PySimpleGUI as sg
-import os.path
 import home
 import img_viewer
 import input_page
+import os.path
+import stitching
+
+import PySimpleGUI as sg
 
 # ----------- Create the 3 layouts this Window will display -----------
 layout1 = home.get_home_layout()
@@ -104,9 +106,11 @@ def main():
             s = stitchImgs.__len__()
             stitchImgs.insert(s, imgClicked)
             window[f'-STITCH-'].update(visible=True)
-            print(stitchImgs)
         elif event == "-STITCH-":
             window[f'-NEXT-'].update(visible=True)
+            # stitching.updateImgs(stitchImgs)
+            stitching.run()
+            print("Stitched " + str(stitchImgs.__len__()) + " images.")
             pass
         else:
             pass

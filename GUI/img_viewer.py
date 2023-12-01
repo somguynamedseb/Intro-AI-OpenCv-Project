@@ -10,7 +10,7 @@ def img_viewer_layout():
     file_list_column = [
         [sg.Text("Image Folder", font=('Helvetica', 30)),
          sg.In(size=(40, 1), enable_events=True, key="-FOLDER-"),
-         sg.FolderBrowse(), ],
+         sg.FolderBrowse(),],
         [sg.Listbox(
             values=[], font=('Helvetica', 15), enable_events=True, size=(40, 20), key="-FILE LIST-")],
     ]
