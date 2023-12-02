@@ -2,7 +2,6 @@ import home
 import img_viewer
 import input_page
 import os.path
-import stitching
 
 import PySimpleGUI as sg
 
@@ -12,6 +11,7 @@ layout1 = home.get_home_layout()
 layout2 = img_viewer.img_viewer_layout()
 
 layout3 = input_page.get_input_layout()
+
 
 stitchImgs = []
 
@@ -27,7 +27,7 @@ layout = [
     [sg.Column([[sg.Text("", size=(0, 5))]], vertical_alignment='center', justification='center')],
     [sg.Column(layout1, visible=True, key='-COL1-', vertical_alignment='center', justification='center'),
      sg.Column(layout2, visible=False, key='-COL2-', vertical_alignment='center', justification='center'),
-     sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center')],
+     sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center'),],
 ]
 
 window = sg.Window('Attendance-AI', layout, finalize=True)
@@ -110,11 +110,13 @@ def main():
             window["-ADDED IMGS-"].update(stitchImgs)
         # delete function for added stitched imgs
         elif event == "-STITCH-":
-            window[f'-NEXT-'].update(visible=True)
             # stitching.updateImgs(stitchImgs)
-            stitching.run()
+            # stitching.run()
+            window[f'-IMGTEXT-'].update("Stitched Image:")
+            window[f'-TOUT-'].update("")
+            # window[f'-IMAGE-'].update(stitchedImg)
+            window[f'-NEXT-'].update(visible=True)
             print("Stitched " + str(stitchImgs.__len__()) + " images.")
-            pass
         else:
             pass
 

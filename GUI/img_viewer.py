@@ -1,9 +1,6 @@
 # img_viewer.py
 
 import PySimpleGUI as sg
-import os.path
-import home
-import input_page
 
 
 def img_viewer_layout():
@@ -19,7 +16,7 @@ def img_viewer_layout():
 
     # For now will only show the name of the file that was chosen
     image_viewer_column = [
-        [sg.Text("Chosen Image from the left:", font=('Helvetica', 30))],
+        [sg.Text("Chosen Image from the left:", font=('Helvetica', 30), key='-IMGTEXT-')],
         [sg.Text(font=('Helvetica', 10), size=(30, 5), key="-TOUT-")],
         [sg.Image(key="-IMAGE-")], ]
 
