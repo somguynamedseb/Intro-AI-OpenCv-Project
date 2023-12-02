@@ -145,7 +145,7 @@ def main():
                     # Convert the stitched image to a PIL Image
                     stitched_pil_image = Image.fromarray(cv2.cvtColor(stitched_img, cv2.COLOR_BGR2RGB))
                     # Define the size to which you want to scale the image
-                    max_width, max_height = 400, 300  # Adjust these values as needed
+                    max_width, max_height = 800, 600  # Adjust these values as needed
                     # Calculate the scaling factor, maintaining the aspect ratio
                     scaling_factor = min(max_width / stitched_pil_image.width, max_height / stitched_pil_image.height)
                     # Compute the new size
