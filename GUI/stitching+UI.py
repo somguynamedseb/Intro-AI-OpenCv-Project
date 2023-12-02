@@ -124,6 +124,7 @@ def main():
             window[f'-ADD-'].update(visible=False)
             window[f'-STITCH-'].update(visible=False)
             window[f'-NEXT-'].update(visible=False)
+            window[f'-IMGTEXT-'].update("Chosen Image from the left:")
             stitchImgs.clear()
         elif event == "-ADD-":
             s = stitchImgs.__len__()
@@ -132,13 +133,6 @@ def main():
             window["-ADDED IMGS-"].update(stitchImgs)
         # delete function for added stitched imgs
         elif event == "-STITCH-":
-            # stitching.updateImgs(stitchImgs)
-            # stitching.run()
-            window[f'-IMGTEXT-'].update("Stitched Image:")
-            window[f'-TOUT-'].update("")
-            # window[f'-IMAGE-'].update(stitchedImg)
-            window[f'-NEXT-'].update(visible=True)
-            print("Stitched " + str(stitchImgs.__len__()) + " images.")
             if len(stitchImgs) >= 2:  # Ensure there are at least two images to stitch
                 # Read images and store them in a list
                 images = [cv2.imread(img) for img in stitchImgs]
@@ -162,8 +156,10 @@ def main():
                     stitched_pil_image.save(bio, format="PNG")
                     bio.seek(0)
                     # Update the GUI to display the resized stitched image
-                    window["-IMAGE-"].update(data=bio.read())
-                    print("Stitched " + str(len(stitchImgs)) + " images.")
+                    window[f'-IMGTEXT-'].update("Stitched Image:")
+                    window[f'-TOUT-'].update("")
+                    window[f'-NEXT-'].update(visible=True)
+                    print("Stitched " + str(stitchImgs.__len__()) + " images.")
                 else:
                     sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))
             else:
