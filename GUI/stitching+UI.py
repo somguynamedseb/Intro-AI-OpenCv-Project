@@ -138,7 +138,7 @@ def main():
                 # Read images and store them in a list
                 images = [cv2.imread(img) for img in stitchImgs]
                 # Create a stitcher object
-                stitcher = cv2.Stitcher.create()
+                stitcher = cv2.Stitcher_create()
                 # Perform the stitching process
                 status, stitched_img = stitcher.stitch(images)
                 if status == cv2.Stitcher_OK:
@@ -160,13 +160,12 @@ def main():
                     window[f'-IMGTEXT-'].update("Stitched Image:")
                     window[f'-TOUT-'].update("")
                     window[f'-NEXT-'].update(visible=True)
-                    print("Stitched " + str(stitchImgs.__len__()) + " images.")
+                    window["-IMAGE-"].update(data=bio.read())  # This line was missing
+                    print("Stitched " + str(len(stitchImgs)) + " images.")
                 else:
                     sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))
             else:
                 sg.popup_error('Need at least two images to stitch!')
-        else:
-            pass
 
         if event == "-CALCULATE-":
             num_students = int(values['-NUM_STUDENTS-'])
