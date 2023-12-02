@@ -1,8 +1,14 @@
+
+from PIL import Image, ImageTk
+import io
+
+
 import home
 import img_viewer
 import input_page
 import os.path
 
+import cv2
 import PySimpleGUI as sg
 
 # ----------- Create the 3 layouts this Window will display -----------
@@ -79,20 +85,36 @@ def main():
                 f
                 for f in file_list
                 if os.path.isfile(os.path.join(folder, f))
-                   and f.lower().endswith((".png", ".gif"))
+                   and f.lower().endswith((".png", ".gif", ".jpg"))
             ]
             window["-FILE LIST-"].update(fnames)
         elif event == "-FILE LIST-":  # A file was chosen from the listbox
             try:
-                filename = os.path.join(
-                    values["-FOLDER-"], values["-FILE LIST-"][0]
-                )
-                window["-TOUT-"].update(filename)
-                window["-IMAGE-"].update(filename=filename)
-                window[f'-ADD-'].update(visible=True)
-                imgClicked = filename
-            except:
-                pass
+                filename = os.path.join(values["-FOLDER-"], values["-FILE LIST-"][0])
+                if os.path.exists(filename):  # Check if the file exists
+                    # Open the image file using Pillow
+                    image = Image.open(filename)
+                    # Define the size to which you want to scale the image
+                    max_width, max_height = 400, 300  # Adjust these values as needed
+                    # Calculate the scaling factor, maintaining the aspect ratio
+                    scaling_factor = min(max_width / image.width, max_height / image.height)
+                    # Compute the new size
+                    new_size = (int(image.width * scaling_factor), int(image.height * scaling_factor))
+                    # Resize the image
+                    image = image.resize(new_size, Image.Resampling.LANCZOS)
+                    # Save the resized image to a BytesIO object
+                    bio = io.BytesIO()
+                    image.save(bio, format="PNG")
+                    bio.seek(0)
+                    # Update the GUI to display the resized image
+                    window["-IMAGE-"].update(data=bio.read())
+                    # Make the '-ADD-' button visible
+                    window["-ADD-"].update(visible=True)
+                    imgClicked = filename
+                else:
+                    sg.popup_error(f"File not found: {filename}")
+            except Exception as e:
+                sg.popup_error(f"An error occurred: {e}")
         elif event == "-RESET-":
             window["-FILE LIST-"].update([])
             window["-ADDED IMGS-"].update([])
@@ -117,6 +139,35 @@ def main():
             # window[f'-IMAGE-'].update(stitchedImg)
             window[f'-NEXT-'].update(visible=True)
             print("Stitched " + str(stitchImgs.__len__()) + " images.")
+            if len(stitchImgs) >= 2:  # Ensure there are at least two images to stitch
+                # Read images and store them in a list
+                images = [cv2.imread(img) for img in stitchImgs]
+                # Create a stitcher object
+                stitcher = cv2.Stitcher.create()
+                # Perform the stitching process
+                status, stitched_img = stitcher.stitch(images)
+                if status == cv2.Stitcher_OK:
+                    # Convert the stitched image to a PIL Image
+                    stitched_pil_image = Image.fromarray(cv2.cvtColor(stitched_img, cv2.COLOR_BGR2RGB))
+                    # Define the size to which you want to scale the image
+                    max_width, max_height = 400, 300  # Adjust these values as needed
+                    # Calculate the scaling factor, maintaining the aspect ratio
+                    scaling_factor = min(max_width / stitched_pil_image.width, max_height / stitched_pil_image.height)
+                    # Compute the new size
+                    new_size = (int(stitched_pil_image.width * scaling_factor), int(stitched_pil_image.height * scaling_factor))
+                    # Resize the image
+                    stitched_pil_image = stitched_pil_image.resize(new_size, Image.Resampling.LANCZOS)
+                    # Save the resized image to a BytesIO object
+                    bio = io.BytesIO()
+                    stitched_pil_image.save(bio, format="PNG")
+                    bio.seek(0)
+                    # Update the GUI to display the resized stitched image
+                    window["-IMAGE-"].update(data=bio.read())
+                    print("Stitched " + str(len(stitchImgs)) + " images.")
+                else:
+                    sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))
+            else:
+                sg.popup_error('Need at least two images to stitch!')
         else:
             pass
 
@@ -131,3 +182,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
