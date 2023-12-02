@@ -95,6 +95,7 @@ def main():
                 pass
         elif event == "-RESET-":
             window["-FILE LIST-"].update([])
+            window["-ADDED IMGS-"].update([])
             window["-TOUT-"].update("")
             window["-IMAGE-"].update(filename="")
             window["-FOLDER-"].update("")
@@ -106,6 +107,8 @@ def main():
             s = stitchImgs.__len__()
             stitchImgs.insert(s, imgClicked)
             window[f'-STITCH-'].update(visible=True)
+            window["-ADDED IMGS-"].update(stitchImgs)
+        # delete function for added stitched imgs
         elif event == "-STITCH-":
             window[f'-NEXT-'].update(visible=True)
             # stitching.updateImgs(stitchImgs)
