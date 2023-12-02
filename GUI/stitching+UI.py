@@ -107,6 +107,7 @@ def main():
                     image.save(bio, format="PNG")
                     bio.seek(0)
                     # Update the GUI to display the resized image
+                    window["-TOUT-"].update(filename)
                     window["-IMAGE-"].update(data=bio.read())
                     # Make the '-ADD-' button visible
                     window["-ADD-"].update(visible=True)
