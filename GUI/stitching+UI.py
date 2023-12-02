@@ -172,6 +172,8 @@ def main():
             num_students = int(values['-NUM_STUDENTS-'])
             num_exemptions = int(values['-NUM_EXEMPTIONS-'])
             total_student = num_students - num_exemptions
+            percentage = total_student/num_students*100
+            window[f'-PERCENTAGE-'].update(str(percentage)+"%")
             print("Total Number Of Students In Class: " + str(total_student))
 
     window.close()
