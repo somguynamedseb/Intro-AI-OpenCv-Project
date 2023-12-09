@@ -27,6 +27,8 @@ def img_viewer_layout():
          sg.Column([
              [sg.Button("Reset", font=('Helvetica', 15), size=10, key="-RESET-")],
              [sg.Button("Add", font=('Helvetica', 15), size=10, key="-ADD-", visible=False)],
-             [sg.Button("Stitch", font=('Helvetica', 15), size=10, key="-STITCH-", visible=False)]])]
+             [sg.Button("Stitch", font=('Helvetica', 15), size=10, key="-STITCH-", visible=False)],
+             [sg.Button("Skip Stitching", font=('Helvetica', 15), size=15, key="-SKIP-", visible=False)],
+         ])]
     ]
     return [[sg.Column(column_to_be_centered, vertical_alignment='center', justification='center')]]

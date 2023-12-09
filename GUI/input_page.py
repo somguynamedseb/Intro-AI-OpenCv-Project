@@ -15,11 +15,16 @@ def get_input_layout():
                  size=8, pad=(190, 0), justification='center')]
     ]
 
+    image_viewer_column = [
+        [sg.Text("Post-Scanned Image:", font=('Helvetica', 30), key='-IMGTEXT-')],
+        [sg.Text(font=('Helvetica', 10), size=(30, 5), key="-TOUT-")],
+        [sg.Image(key="-SCANNED IMAGE-")], ]
+
     # ----- Full layout -----
     layout = [
-        [sg.Column(inputs, vertical_alignment='center', justification='center',),
+        [sg.Column(image_viewer_column),
+         sg.VSeperator(),
+         sg.Column(inputs),
          ]
     ]
     return layout
-
-
