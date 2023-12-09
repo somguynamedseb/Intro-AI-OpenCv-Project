@@ -20,6 +20,10 @@ stitchImgs = []
 
 imgClicked = ""
 
+scannedStudents = -1
+
+confidenceScan = 0.60
+
 # ----------- Create actual layout using Columns and a row of Buttons
 layout = [
     [sg.Button('Exit', font=('Helvetica', 15), size=10)],
@@ -161,11 +165,10 @@ def main():
             # stitched_pil_image.save(bio, format="PNG")
             # bio.seek(0)
 
-            # window["-SCANNED IMAGE-"].update(data=img)
-
             # # LINK TO AI SCAN FUNCTION @SEB (img is of type bytes)
-            # confidence = .6  # change the confidence at will
-            # scannedImg, scannedStudents = scanImage(img, confidence)
+            # scannedImg, sStudents = scanImage(img, confidenceScan)
+            # scannedStudents = sStudents
+            # window["-SCANNED IMAGE-"].update(data=scannedImg)
 
         elif event == "-STITCH-":
             if len(stitchImgs) >= 2:  # Ensure there are at least two images to stitch
@@ -198,12 +201,12 @@ def main():
                     window[f'-NEXT-'].update(visible=True)
                     img = bio.read()
                     window["-IMAGE-"].update(data=img)
-                    window["-SCANNED IMAGE-"].update(data=img)
-                    # print("Stitched " + str(len(stitchImgs)) + " images.")
+                    window["-SCANNED IMAGE-"].update(data=img)  # delete this when AI part below is good
 
                     # # LINK TO AI SCAN FUNCTION @SEB (img is of type bytes)
-                    # confidence = .6  # change the confidence at will
-                    # scannedImg, scannedStudents = scanImage(img, confidence)
+                    # scannedImg, scannedStudents = scanImage(img, confidenceScan)
+                    # scannedStudents = sStudents
+                    # window["-SCANNED IMAGE-"].update(data=scannedImg)
                 else:
                     sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))
             else:
@@ -212,10 +215,11 @@ def main():
         if event == "-CALCULATE-":
             num_students = int(values['-NUM_STUDENTS-'])
             num_exemptions = int(values['-NUM_EXEMPTIONS-'])
-            total_student = num_students - num_exemptions
+            total_student = num_students - num_exemptions - (num_students - scannedStudents)
             percentage = total_student / num_students * 100
             window[f'-PERCENTAGE-'].update(str(percentage) + "%")
-            print("Total Number Of Students In Class: " + str(total_student))
+            print("Total Number Of Students In Class: " + str(scannedStudents)
+                  + " at a " + str(confidenceScan * 100) + " % confidence level.")
 
     window.close()
 
