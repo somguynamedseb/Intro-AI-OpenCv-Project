@@ -135,7 +135,7 @@ def main():
             elif stitchImgs.__len__() > 1:
                 window["-SKIP-"].update(visible=False)
                 window[f'-STITCH-'].update(visible=True)
-            # make a delete function for added stitched imgs
+            # possibly make a delete function for added stitched imgs
         elif event == "-SKIP-":
             window[f'-COL{page}-'].update(visible=False)
             page = maxPages
@@ -213,13 +213,17 @@ def main():
                 sg.popup_error('Need at least two images to stitch!')
 
         if event == "-CALCULATE-":
-            num_students = int(values['-NUM_STUDENTS-'])
-            num_exemptions = int(values['-NUM_EXEMPTIONS-'])
-            total_student = num_students - num_exemptions - (num_students - scannedStudents)
-            percentage = total_student / num_students * 100
-            window[f'-PERCENTAGE-'].update(str(percentage) + "%")
-            print("Total Number Of Students In Class: " + str(scannedStudents)
-                  + " at a " + str(confidenceScan * 100) + " % confidence level.")
+            try:
+                v = values['-NUM_STUDENTS-']
+                num_students = int(v)
+                num_exemptions = int(v)
+                total_student = num_students - num_exemptions - (num_students - scannedStudents)
+                percentage = total_student / num_students * 100
+                window[f'-PERCENTAGE-'].update(str(percentage) + "%")
+                print("Total Number Of Students In Class: " + str(scannedStudents)
+                      + " at a " + str(confidenceScan * 100) + " % confidence level.")
+            except:
+                sg.popup_error("Please Enter A Valid Number")
 
     window.close()
 
