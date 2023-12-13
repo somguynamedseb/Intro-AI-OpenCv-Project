@@ -66,7 +66,7 @@ class image_manager:
         # DIR = os.path.join(results[0].save_dir, (os.listdir(results[0].save_dir))[0]) # THIS LINE ERRORS
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         DIR = os.path.join(results[0].save_dir, f"scanned_image_{timestamp}")
-        self.detected_img = DIR # THIS NEEDS TO BE IN BYTES WHEN RETURNED
+        self.detected_img = DIR  # THIS NEEDS TO BE A FILENAME WHERE IT IS SAVED OR IN BYTES IF NOT SAVED WHEN RETURNED
         self.face_count = len(results[0].boxes.xyxy)
         return [self.detected_img, self.face_count]
 
