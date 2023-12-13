@@ -42,6 +42,7 @@ def main():
     confidenceScan = 0.60
     maxPages = 3
     page = 1  # The currently visible layout
+    im = image_manager.image_manager
     window[f'-BACK-'].update(visible=False)
     while True:
         event, values = window.read()
@@ -117,7 +118,7 @@ def main():
             window[f'-NEXT-'].update(visible=False)
             window["-SKIP-"].update(visible=False)
             window[f'-IMGTEXT-'].update("Chosen Image from the left:")
-            stitchImgs.clear()
+            im.clear_images()
         elif event == "-ADD-":
             stitchImgs.insert(stitchImgs.__len__(), imgClicked)
             window["-ADDED IMGS-"].update(stitchImgs)
@@ -163,12 +164,11 @@ def main():
             # scannedStudents = im.face_count()
             window["-SCANNED IMAGE-"].update(data=d)
         elif event == "-STITCH-":
-            im = image_manager.image_manager
             if len(stitchImgs) >= 2:  # Ensure there are at least two images to stitch
-                sImg = im.stich_images(im, stitchImgs)
+                im.add_image(stitchImgs)
+                sImg = im.stich_images()
 
                 # LINK TO AI SCAN FUNCTION
-                # im.add_image(sImg)
                 # scannedImg = im.detect_faces()
                 # scannedStudents = im.face_count()
 

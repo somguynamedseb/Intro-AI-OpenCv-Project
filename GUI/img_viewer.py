@@ -1,5 +1,3 @@
-# img_viewer.py
-
 import PySimpleGUI as sg
 
 
