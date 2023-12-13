@@ -1,9 +1,12 @@
 import os
-# from ultralytics import YOLO
+from ultralytics import YOLO
 from PIL import Image
 import cv2 as cv
-import io
 import PySimpleGUI as sg
+import io
+
+
+model = YOLO("runs/detect/train4/weights/last.pt")
 
 
 class image_manager:
@@ -49,10 +52,18 @@ class image_manager:
             sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))
             return None
 
-
-    # detects faces within stored images
     def detect_faces(self) -> str:  ##returns DIR of output img
-        raise NotImplementedError
+        if not self.img_arr:
+            raise ValueError("No images to detect faces in")
+        if self.img_arr:
+            # if self.saved_img ==None:
+            # self.saved_img = self.stich_images()
+            img = Image.open(self.saved_img)
+            results = model.predict(source=img, save=True)  # save plotted images
+            DIR = os.path.join(results[0].save_dir, (os.listdir(results[0].save_dir))[0])
+            self.detected_img = DIR
+            self.face_count = len(len(results[0].boxes.xyxy))
+        return [self.detected_img, self.face_count]
 
     def face_count(self) -> int:
         return self.face_count
