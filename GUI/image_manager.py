@@ -57,7 +57,7 @@ class image_manager:
             return None
 
     #detects faces within stored images
-    def detect_faces(self)->str: ##returns DIR of output img
+    def detect_faces(self)->[str,int]: ##returns DIR of output img
         if self.img_arr == []:
             raise ValueError("No images to detect faces in")
         if self.img_arr != []:
