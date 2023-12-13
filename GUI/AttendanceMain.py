@@ -4,6 +4,7 @@ import io
 import home
 import img_viewer
 import input_page
+import image_manager
 import os.path
 
 import cv2
@@ -20,7 +21,7 @@ stitchImgs = []
 
 imgClicked = ""
 
-scannedStudents = -1
+scannedStudents = 1
 
 confidenceScan = 0.60
 
@@ -142,73 +143,46 @@ def main():
             window[f'-COL{page}-'].update(visible=True)
             window[f'-NEXT-'].update(visible=False)
 
-            #     NEED TO FIGURE OUT HOW TO ASSIGN THE image VARIABLE IF WE SKIP STITCHING
-            # image = stitchImgs[0]
-            # # Create a stitcher object
-            # stitcher = cv2.Stitcher.create()
-            # # Perform the stitching process
-            # status, stitched_img = stitcher.stitch(image)
-            #
-            # stitched_pil_image = Image.fromarray(cv2.cvtColor(stitched_img, cv2.COLOR_BGR2RGB))
-            # # Define the size to which you want to scale the image
-            # max_width, max_height = 800, 600  # Adjust these values as needed
-            # # Calculate the scaling factor, maintaining the aspect ratio
-            # scaling_factor = min(max_width / stitched_pil_image.width, max_height / stitched_pil_image.height)
-            # # Compute the new size
-            # new_size = (int(stitched_pil_image.width * scaling_factor),
-            #             int(stitched_pil_image.height * scaling_factor))
-            # # Resize the image
-            # stitched_pil_image = stitched_pil_image.resize(new_size, Image.Resampling.LANCZOS)
-            # # Save the resized image to a BytesIO object
-            # img = bio.read()
-            # bio = io.BytesIO()
-            # stitched_pil_image.save(bio, format="PNG")
-            # bio.seek(0)
+            filename = stitchImgs[0]
+            if os.path.exists(filename):  # Check if the file exists
+                # Open the image file using Pillow
+                image = Image.open(filename)
+                # Define the size to which you want to scale the image
+                max_width, max_height = 400, 300  # Adjust these values as needed
+                # Calculate the scaling factor, maintaining the aspect ratio
+                scaling_factor = min(max_width / image.width, max_height / image.height)
+                # Compute the new size
+                new_size = (int(image.width * scaling_factor), int(image.height * scaling_factor))
+                # Resize the image
+                image = image.resize(new_size, Image.Resampling.LANCZOS)
+                # Save the resized image to a BytesIO object
+                bio = io.BytesIO()
+                image.save(bio, format="PNG")
+                bio.seek(0)
+                # Update the GUI to display the resized image
+                d = bio.read()
+                window["-TOUT-"].update(filename)
+                window["-IMAGE-"].update(data=d)
+                img = filename
 
-            # # LINK TO AI SCAN FUNCTION @SEB (img is of type bytes)
-            # scannedImg, sStudents = scanImage(img, confidenceScan)
-            # scannedStudents = sStudents
-            # window["-SCANNED IMAGE-"].update(data=scannedImg)
+            # # LINK TO AI SCAN FUNCTION
+            # im = image_manager.image_manager
+            # im.add_image(img)
+            # scannedImg = im.detect_faces()
+            # scannedStudents = im.face_count()
+            window["-SCANNED IMAGE-"].update(data=d)
 
         elif event == "-STITCH-":
+            im = image_manager.image_manager
             if len(stitchImgs) >= 2:  # Ensure there are at least two images to stitch
-                # Read images and store them in a list
-                images = [cv2.imread(img) for img in stitchImgs]
-                # Create a stitcher object
-                stitcher = cv2.Stitcher.create()
-                # Perform the stitching process
-                status, stitched_img = stitcher.stitch(images)
-                if status == cv2.Stitcher_OK:
-                    # Convert the stitched image to a PIL Image
-                    stitched_pil_image = Image.fromarray(cv2.cvtColor(stitched_img, cv2.COLOR_BGR2RGB))
-                    # Define the size to which you want to scale the image
-                    max_width, max_height = 800, 600  # Adjust these values as needed
-                    # Calculate the scaling factor, maintaining the aspect ratio
-                    scaling_factor = min(max_width / stitched_pil_image.width, max_height / stitched_pil_image.height)
-                    # Compute the new size
-                    new_size = (int(stitched_pil_image.width * scaling_factor),
-                                int(stitched_pil_image.height * scaling_factor))
-                    # Resize the image
-                    stitched_pil_image = stitched_pil_image.resize(new_size, Image.Resampling.LANCZOS)
-                    # Save the resized image to a BytesIO object
-                    bio = io.BytesIO()
-                    stitched_pil_image.save(bio, format="PNG")
-                    bio.seek(0)
-                    # Update the GUI to display the resized stitched image
-                    window[f'-IMGTEXT-'].update("Stitched Image:")
-                    window[f'-TOUT-'].update("")
-                    window["-SKIP-"].update(visible=False)
-                    window[f'-NEXT-'].update(visible=True)
-                    img = bio.read()
-                    window["-IMAGE-"].update(data=img)
-                    window["-SCANNED IMAGE-"].update(data=img)  # delete this when AI part below is good
+                sImg = im.stich_images(stitchImgs, window)
 
-                    # # LINK TO AI SCAN FUNCTION @SEB (img is of type bytes)
-                    # scannedImg, scannedStudents = scanImage(img, confidenceScan)
-                    # scannedStudents = sStudents
-                    # window["-SCANNED IMAGE-"].update(data=scannedImg)
-                else:
-                    sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))
+                # LINK TO AI SCAN FUNCTION
+                # im.add_image(sImg)
+                # scannedImg = im.detect_faces()
+                # scannedStudents = im.face_count()
+                # window["-SCANNED IMAGE-"].update(data=scannedImg)
+
             else:
                 sg.popup_error('Need at least two images to stitch!')
 
@@ -217,8 +191,9 @@ def main():
                 v = values['-NUM_STUDENTS-']
                 num_students = int(v)
                 num_exemptions = int(v)
+                # if everyone is in the class then num_students and scannedStudents should be equal
                 total_student = num_students - num_exemptions - (num_students - scannedStudents)
-                percentage = total_student / num_students * 100
+                percentage: int = total_student / num_students * 100
                 window[f'-PERCENTAGE-'].update(str(percentage) + "%")
                 print("Total Number Of Students In Class: " + str(scannedStudents)
                       + " at a " + str(confidenceScan * 100) + " % confidence level.")
