@@ -43,6 +43,7 @@ def main():
     maxPages = 3
     page = 1  # The currently visible layout
     im = image_manager.image_manager
+    readyScanImage: bytes = ""
     window[f'-BACK-'].update(visible=False)
     while True:
         event, values = window.read()
@@ -86,23 +87,10 @@ def main():
             try:
                 filename = os.path.join(values["-FOLDER-"], values["-FILE LIST-"][0])
                 if os.path.exists(filename):  # Check if the file exists
-                    # Open the image file using Pillow
-                    image = Image.open(filename)
-                    # Define the size to which you want to scale the image
-                    max_width, max_height = 400, 300  # Adjust these values as needed
-                    # Calculate the scaling factor, maintaining the aspect ratio
-                    scaling_factor = min(max_width / image.width, max_height / image.height)
-                    # Compute the new size
-                    new_size = (int(image.width * scaling_factor), int(image.height * scaling_factor))
-                    # Resize the image
-                    image = image.resize(new_size, Image.Resampling.LANCZOS)
-                    # Save the resized image to a BytesIO object
-                    bio = io.BytesIO()
-                    image.save(bio, format="PNG")
-                    bio.seek(0)
+                    data = find_data_from_dir(filename)
                     # Update the GUI to display the resized image
                     window["-TOUT-"].update(filename)
-                    window["-IMAGE-"].update(data=bio.read())
+                    window["-IMAGE-"].update(data=data)
                     # Make the '-ADD-' button visible
                     window["-ADD-"].update(visible=True)
                     imgClicked = filename
@@ -111,14 +99,20 @@ def main():
             except Exception as e:
                 sg.popup_error(f"An error occurred: {e}")
         elif event == "-RESET-":
+            window["-FILE LIST-"].update([])
             window["-ADDED IMGS-"].update([])
+            window["-TOUT-"].update("")
             window["-IMAGE-"].update(filename="")
+            window["-FOLDER-"].update("")
             window[f'-ADD-'].update(visible=False)
             window[f'-STITCH-'].update(visible=False)
             window[f'-NEXT-'].update(visible=False)
-            window["-SKIP-"].update(visible=False)
+            window[f'-SKIP-'].update(visible=False)
             window[f'-IMGTEXT-'].update("Chosen Image from the left:")
-            im.clear_images()
+            window['-NUM STUDENTS-'].update([])
+            window['-NUM EXEMPTIONS-'].update([])
+            stitchImgs.clear()
+            readyScanImage = ''
         elif event == "-ADD-":
             stitchImgs.insert(stitchImgs.__len__(), imgClicked)
             window["-ADDED IMGS-"].update(stitchImgs)
@@ -137,61 +131,42 @@ def main():
 
             filename = stitchImgs[0]
             if os.path.exists(filename):  # Check if the file exists
-                # Open the image file using Pillow
-                image = Image.open(filename)
-                # Define the size to which you want to scale the image
-                max_width, max_height = 400, 300  # Adjust these values as needed
-                # Calculate the scaling factor, maintaining the aspect ratio
-                scaling_factor = min(max_width / image.width, max_height / image.height)
-                # Compute the new size
-                new_size = (int(image.width * scaling_factor), int(image.height * scaling_factor))
-                # Resize the image
-                image = image.resize(new_size, Image.Resampling.LANCZOS)
-                # Save the resized image to a BytesIO object
-                bio = io.BytesIO()
-                image.save(bio, format="PNG")
-                bio.seek(0)
-                # Update the GUI to display the resized image
-                d = bio.read()
+                img = find_data_from_dir(filename)
                 window["-TOUT-"].update(filename)
-                window["-IMAGE-"].update(data=d)
-                img = filename
+                window["-IMAGE-"].update(data=img)
+                readyScanImage = img
 
-            # # LINK TO AI SCAN FUNCTION
-            # im = image_manager.image_manager
-            # im.add_image(img)
-            # scannedImg = im.detect_faces()
-            # scannedStudents = im.face_count()
-            window["-SCANNED IMAGE-"].update(data=d)
         elif event == "-STITCH-":
             if len(stitchImgs) >= 2:  # Ensure there are at least two images to stitch
-                im.add_image(stitchImgs)
-                sImg = im.stich_images()
-
                 # LINK TO AI SCAN FUNCTION
-                # scannedImg = im.detect_faces()
-                # scannedStudents = im.face_count()
+                im.add_image(im, stitchImgs)
+                imgBytes = im.stitch_images(im)
+                window["-IMAGE-"].update(data=imgBytes)
+                readyScanImage = imgBytes
 
-                window["-IMAGE-"].update(data=sImg)
                 window[f'-IMGTEXT-'].update("Stitched Image:")
                 window[f'-TOUT-'].update("")
                 window["-SKIP-"].update(visible=False)
                 window[f'-NEXT-'].update(visible=True)
                 window[f'-STITCH-'].update(visible=False)
                 window["-ADD-"].update(visible=False)
-                window["-SCANNED IMAGE-"].update(data=sImg)
                 window["-FILE LIST-"].update([])
                 window["-FOLDER-"].update("")
             else:
                 sg.popup_error('Need at least two images to stitch!')
         elif event == "-CALCULATE-":
+            sImgDir, scannedStudents = im.detect_faces(im, readyScanImage)
             try:
-                v = values['-NUM_STUDENTS-']
-                num_students = int(v)
-                num_exemptions = int(v)
+                vS = values['-NUM STUDENTS-']
+                vE = values['-NUM EXEMPTIONS-']
+                num_students = int(vS)
+                num_exemptions = int(vE)
                 # if everyone is in the class then num_students and scannedStudents should be equal
                 total_student = num_students - num_exemptions - (num_students - scannedStudents)
                 percentage: int = total_student / num_students * 100
+
+                scannedImgBytes = find_data_from_dir(sImgDir)
+                window["-SCANNED IMAGE-"].update(data=scannedImgBytes)
                 window[f'-PERCENTAGE-'].update(str(percentage) + "%")
                 print("Total Number Of Students In Class: " + str(scannedStudents)
                       + " at a " + str(confidenceScan * 100) + " % confidence level.")
@@ -199,6 +174,24 @@ def main():
                 sg.popup_error("Please Enter A Valid Number")
 
     window.close()
+
+
+def find_data_from_dir(filename):
+    # Open the image file using Pillow
+    image = Image.open(filename)
+    # Define the size to which you want to scale the image
+    max_width, max_height = 400, 300  # Adjust these values as needed
+    # Calculate the scaling factor, maintaining the aspect ratio
+    scaling_factor = min(max_width / image.width, max_height / image.height)
+    # Compute the new size
+    new_size = (int(image.width * scaling_factor), int(image.height * scaling_factor))
+    # Resize the image
+    image = image.resize(new_size, Image.Resampling.LANCZOS)
+    # Save the resized image to a BytesIO object
+    bio = io.BytesIO()
+    image.save(bio, format="PNG")
+    bio.seek(0)
+    return bio.read()
 
 
 if __name__ == "__main__":

@@ -4,6 +4,8 @@ from PIL import Image
 import cv2 as cv
 import PySimpleGUI as sg
 import io
+from io import BytesIO
+import datetime
 
 model = YOLO("last.pt")
 
@@ -11,19 +13,18 @@ model = YOLO("last.pt")
 class image_manager:
     def __init__(self):
         self.img_arr = []  # array of images for stitching
-        self.saved_img = None  # directory of stitched or non stiched image
         self.detected_img = None  # directory of most recent detected image
         self.face_count = -1  # detected faces
 
     def add_image(self, imgDIR):
-        self.img_arr = [self.img_arr, imgDIR]
+        self.img_arr = imgDIR
 
     def clear_images(self):
         self.img_arr = []
 
-    def stich_images(self) -> [str]:  ##returns DIR of stiched img
+    def stitch_images(self) -> [str]:  ##returns DIR of stiched img
         # Read images and store them in a list
-        images = self.img_arr
+        images = [cv.imread(img) for img in self.img_arr]
         # Create a stitcher object
         stitcher = cv.Stitcher.create()
         # Perform the stitching process
@@ -40,29 +41,34 @@ class image_manager:
                         int(stitched_pil_image.height * scaling_factor))
             # Resize the image
             stitched_pil_image = stitched_pil_image.resize(new_size, Image.Resampling.LANCZOS)
-            # Save the resized image to a BytesIO object
             bio = io.BytesIO()
             stitched_pil_image.save(bio, format="PNG")
             bio.seek(0)
-            # Update the GUI to display the resized stitched image
-            img = bio.read()
-            return img
+            imgBytes = bio.read()
+
+            # timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            # filename = f"last_stitched_Image_{timestamp}"
+            # image = Image.open(BytesIO(imgBytes))
+            # image.save(os.path.join(os.path.dirname(__file__), filename))
+
+            return imgBytes
         else:
             sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))
             return None
 
-    def detect_faces(self) -> [str, int]:  ##returns DIR of output img
-        if not self.img_arr:
-            raise ValueError("No images to detect faces in")
-        if self.img_arr:
-            # if self.saved_img ==None:
-            # self.saved_img = self.stich_images()
-            img = Image.open(self.saved_img)
-            results = model.predict(source=img, save=True)  # save plotted images
-            DIR = os.path.join(results[0].save_dir, (os.listdir(results[0].save_dir))[0])
-            self.detected_img = DIR
-            self.face_count = len(len(results[0].boxes.xyxy))
+    def detect_faces(self, saved_img) -> [str, int]:  # returns DIR of output img
+        if isinstance(saved_img, bytes):
+            img = Image.open(BytesIO(saved_img))
+        else:
+            img = Image.open(saved_img)
+
+        results = model.predict(source=img, save=True)  # save plotted images
+        # DIR = os.path.join(results[0].save_dir, (os.listdir(results[0].save_dir))[0]) # THIS LINE ERRORS
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        DIR = os.path.join(results[0].save_dir, f"scanned_image_{timestamp}")
+        self.detected_img = DIR # THIS NEEDS TO BE IN BYTES WHEN RETURNED
+        self.face_count = len(results[0].boxes.xyxy)
         return [self.detected_img, self.face_count]
 
-    def face_count(self) -> int:
+    def get_face_count(self) -> int:
         return self.face_count

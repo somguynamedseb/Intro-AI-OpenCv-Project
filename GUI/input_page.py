@@ -4,10 +4,10 @@ import PySimpleGUI as sg
 def get_input_layout():
     inputs = [
         [sg.Text("Total Number Of Students", font=('Helvetica', 30))],
-        [sg.Input("0", key='-NUM_STUDENTS-', font=('Helvetica', 15), size=15, pad=(150, 0))],
+        [sg.Input("0", key='-NUM STUDENTS-', font=('Helvetica', 15), size=15, pad=(150, 0))],
         [sg.Text("", size=(0, 2))],
         [sg.Text("Number Of Exemptions", font=('Helvetica', 30))],
-        [sg.Input("0", key='-NUM_EXEMPTIONS-', font=('Helvetica', 15), size=15, pad=(150, 0))],
+        [sg.Input("0", key='-NUM EXEMPTIONS-', font=('Helvetica', 15), size=15, pad=(150, 0))],
         [sg.Text("", size=(0, 5))],
         [sg.Button("Calculate", font=('Helvetica', 15), size=15, pad=(150, 0), key="-CALCULATE-")],
         [sg.Text("", size=(0, 1))],
@@ -18,7 +18,7 @@ def get_input_layout():
     image_viewer_column = [
         [sg.Text("Post-Scanned Image:", font=('Helvetica', 30), key='-IMGTEXT-')],
         [sg.Text(font=('Helvetica', 10), size=(30, 5), key="-TOUT-")],
-        [sg.Image(key="-SCANNED IMAGE-")], ]
+        [sg.Image(key="-SCANNED IMAGE-")],]
     # Add a total students scanned and at what confidence rate objects
 
     # ----- Full layout -----
