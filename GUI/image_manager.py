@@ -63,10 +63,9 @@ class image_manager:
             img = Image.open(saved_img)
 
         results = model.predict(source=img, save=True)  # save plotted images
-        # DIR = os.path.join(results[0].save_dir, (os.listdir(results[0].save_dir))[0]) # THIS LINE ERRORS
-        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        DIR = os.path.join(results[0].save_dir, f"scanned_image_{timestamp}")
-        self.detected_img = DIR  # THIS NEEDS TO BE A FILENAME WHERE IT IS SAVED OR IN BYTES IF NOT SAVED WHEN RETURNED
+        d = results[0].save_dir
+        DIR = os.path.join(d, (os.listdir(d)[0]))  # error is that there is no image actually saved in the predict file
+        self.detected_img = DIR
         self.face_count = len(results[0].boxes.xyxy)
         return [self.detected_img, self.face_count]
 
