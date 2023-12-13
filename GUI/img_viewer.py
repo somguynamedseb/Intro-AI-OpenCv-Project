@@ -5,13 +5,13 @@ import PySimpleGUI as sg
 
 def img_viewer_layout():
     file_list_column = [
-        [sg.Text("Image Folder", font=('Helvetica', 30)),
+        [sg.Text("Image Folder", font=('Helvetica', 30), key='-TEXT IMG FOLDER-'),
          sg.In(size=(40, 1), enable_events=True, key="-FOLDER-"),
-         sg.FolderBrowse(), ],
+         sg.FolderBrowse(key='-FBROWSE-')],
         [sg.Listbox(
             values=[], font=('Helvetica', 15), enable_events=True, size=(30, 15), key="-FILE LIST-")],
-        [sg.Text("Current Stitching List: ", font=('Helvetica', 15))],
-        [sg.Listbox(values=[], key="-ADDED IMGS-", font=('Helvetica', 10), size=(40, 10), enable_events=True)]
+        [sg.Text("Current Stitching List: ", font=('Helvetica', 20))],
+        [sg.Listbox(values=[], key="-ADDED IMGS-", font=('Helvetica', 10), size=(45, 10), enable_events=True)]
     ]
 
     # For now will only show the name of the file that was chosen
@@ -22,7 +22,7 @@ def img_viewer_layout():
 
     # ----- Full layout -----
     column_to_be_centered = [
-        [sg.Column(file_list_column), sg.VSeperator(),
+        [sg.Column(file_list_column, key='-LISTCOL-'), sg.VSeperator(),
          sg.Column(image_viewer_column),
          sg.Column([
              [sg.Button("Reset", font=('Helvetica', 15), size=10, key="-RESET-")],

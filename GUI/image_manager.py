@@ -19,7 +19,7 @@ class image_manager:
     def clear_images(self):
         self.img_arr = []
 
-    def stich_images(self, stitchImgs, window):
+    def stich_images(self, stitchImgs):
         # Read images and store them in a list
         images = [cv.imread(img) for img in stitchImgs]
         # Create a stitcher object
@@ -44,11 +44,6 @@ class image_manager:
             bio.seek(0)
             # Update the GUI to display the resized stitched image
             img = bio.read()
-            window["-IMAGE-"].update(data=img)
-            window[f'-IMGTEXT-'].update("Stitched Image:")
-            window[f'-TOUT-'].update("")
-            window["-SKIP-"].update(visible=False)
-            window[f'-NEXT-'].update(visible=True)
             return img
         else:
             sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))

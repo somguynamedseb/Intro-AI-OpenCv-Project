@@ -17,17 +17,9 @@ layout2 = img_viewer.img_viewer_layout()
 
 layout3 = input_page.get_input_layout()
 
-stitchImgs = []
-
-imgClicked = ""
-
-scannedStudents = 1
-
-confidenceScan = 0.60
-
 # ----------- Create actual layout using Columns and a row of Buttons
 layout = [
-    [sg.Button('Exit', font=('Helvetica', 15), size=10)],
+    [sg.Button('Exit', font=('Helvetica', 15), size=10, key='-EXIT-')],
     [sg.Column([[
         sg.Button('Back', key='-BACK-', font=('Helvetica', 15), size=10),
         sg.Button('Next', key="-NEXT-", font=('Helvetica', 15), size=10), ]],
@@ -36,6 +28,7 @@ layout = [
     [sg.Column(layout1, visible=True, key='-COL1-', vertical_alignment='center', justification='center'),
      sg.Column(layout2, visible=False, key='-COL2-', vertical_alignment='center', justification='center'),
      sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center'), ],
+    [sg.Button('Full Screen', font=('Helvetica', 15), size=10, key='-FSCREEN-')],
 ]
 
 window = sg.Window('Attendance-AI', layout, finalize=True)
@@ -43,19 +36,21 @@ window.maximize()
 
 
 def main():
-    global imgClicked
+    stitchImgs = []
+    imgClicked = ""
+    scannedStudents = 1
+    confidenceScan = 0.60
     maxPages = 3
     page = 1  # The currently visible layout
     window[f'-BACK-'].update(visible=False)
     while True:
         event, values = window.read()
         # print("PAGE: " + str(page))
-        if event in (None, 'Exit'):
+        if event in (None, "-EXIT-"):
             break
-        if event == sg.WIN_CLOSED:
+        elif event == sg.WIN_CLOSED:
             break
-
-        if event == "-BACK-":
+        elif event == "-BACK-":
             if page > 1:
                 window[f'-BACK-'].update(visible=True)
                 window[f'-NEXT-'].update(visible=True)
@@ -71,8 +66,7 @@ def main():
                 page += 1
                 window[f'-COL{page}-'].update(visible=True)
                 window[f'-NEXT-'].update(visible=False)
-
-        if event == "-FOLDER-":
+        elif event == "-FOLDER-":
             folder = values["-FOLDER-"]
             try:
                 # Get list of files in folder
@@ -116,11 +110,8 @@ def main():
             except Exception as e:
                 sg.popup_error(f"An error occurred: {e}")
         elif event == "-RESET-":
-            window["-FILE LIST-"].update([])
             window["-ADDED IMGS-"].update([])
-            window["-TOUT-"].update("")
             window["-IMAGE-"].update(filename="")
-            window["-FOLDER-"].update("")
             window[f'-ADD-'].update(visible=False)
             window[f'-STITCH-'].update(visible=False)
             window[f'-NEXT-'].update(visible=False)
@@ -171,22 +162,29 @@ def main():
             # scannedImg = im.detect_faces()
             # scannedStudents = im.face_count()
             window["-SCANNED IMAGE-"].update(data=d)
-
         elif event == "-STITCH-":
             im = image_manager.image_manager
             if len(stitchImgs) >= 2:  # Ensure there are at least two images to stitch
-                sImg = im.stich_images(stitchImgs, window)
+                sImg = im.stich_images(im, stitchImgs)
 
                 # LINK TO AI SCAN FUNCTION
                 # im.add_image(sImg)
                 # scannedImg = im.detect_faces()
                 # scannedStudents = im.face_count()
-                # window["-SCANNED IMAGE-"].update(data=scannedImg)
 
+                window["-IMAGE-"].update(data=sImg)
+                window[f'-IMGTEXT-'].update("Stitched Image:")
+                window[f'-TOUT-'].update("")
+                window["-SKIP-"].update(visible=False)
+                window[f'-NEXT-'].update(visible=True)
+                window[f'-STITCH-'].update(visible=False)
+                window["-ADD-"].update(visible=False)
+                window["-SCANNED IMAGE-"].update(data=sImg)
+                window["-FILE LIST-"].update([])
+                window["-FOLDER-"].update("")
             else:
                 sg.popup_error('Need at least two images to stitch!')
-
-        if event == "-CALCULATE-":
+        elif event == "-CALCULATE-":
             try:
                 v = values['-NUM_STUDENTS-']
                 num_students = int(v)
