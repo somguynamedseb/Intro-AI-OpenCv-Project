@@ -5,7 +5,7 @@ import cv2 as cv
 import io
 import PySimpleGUI as sg
 
-model = YOLO("runs/detect/train4/weights/last.pt")
+model = YOLO("last.pt")
 
 class image_manager:
     def __init__(self):
