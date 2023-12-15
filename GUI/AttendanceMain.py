@@ -166,11 +166,11 @@ def main():
                 total_student = num_students - num_exemptions - (num_students - scannedStudents)
                 percentage: int = total_student / num_students * 100
 
-                scannedImgBytes = find_data_from_dir(sImgDir)
-                window["-SCANNED IMAGE-"].update(data=scannedImgBytes)
+                # scannedImgBytes = find_data_from_dir(sImgDir)
+                window["-SCANNED IMAGE-"].update(data=readyScanImage)
                 window[f'-PERCENTAGE-'].update(str(percentage) + "%")
-                print("Total Number Of Students In Class: " + str(scannedStudents)
-                      + " at a " + str(confidenceScan * 100) + " % confidence level.")
+                # print("Total Number Of Students In Class: " + str(scannedStudents)
+                #       + " at a " + str(confidenceScan * 100) + " % confidence level.")
             except:
                 sg.popup_error("Please Enter A Valid Number")
 
@@ -201,11 +201,9 @@ def detect_faces(imgDIR) -> [str, int]:  # returns DIR of output img
         else:
             img = Image.open(imgDIR)
         results = model.predict(source=img, save=True)  # save plotted images
-        d = results[0].save_dir
-        print(str(d))
-        DIR = os.path.join(d, (os.listdir(d)[0]))  # error is that there is no image actually saved in the predict file
-        detected_img = DIR
-        face_count = len(results[0].boxes.xyxy)
+        result= results[0]
+        detected_img= str(result.save_dir)
+        face_count = len(result.boxes.xyxy)
         detected_img = detected_img.replace("\\", "/")
         return [detected_img, face_count]
 
