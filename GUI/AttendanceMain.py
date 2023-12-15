@@ -9,6 +9,8 @@ import os.path
 
 import cv2
 import PySimpleGUI as sg
+from io import BytesIO
+from ultralytics import YOLO
 
 # ----------- Create the 3 layouts this Window will display -----------
 layout1 = home.get_home_layout()
@@ -154,7 +156,7 @@ def main():
             else:
                 sg.popup_error('Need at least two images to stitch!')
         elif event == "-CALCULATE-":
-            sImgDir, scannedStudents = im.detect_faces(im, readyScanImage)
+            sImgDir, scannedStudents = detect_faces(readyScanImage)
             try:
                 vS = values['-NUM STUDENTS-']
                 vE = values['-NUM EXEMPTIONS-']
@@ -191,6 +193,21 @@ def find_data_from_dir(filename):
     image.save(bio, format="PNG")
     bio.seek(0)
     return bio.read()
+
+def detect_faces(imgDIR) -> [str, int]:  # returns DIR of output img
+        model = YOLO('train3/weights/last.pt')
+        if isinstance(imgDIR, bytes):
+            img = Image.open(BytesIO(imgDIR))
+        else:
+            img = Image.open(imgDIR)
+        results = model.predict(source=img, save=True)  # save plotted images
+        d = results[0].save_dir
+        print(str(d))
+        DIR = os.path.join(d, (os.listdir(d)[0]))  # error is that there is no image actually saved in the predict file
+        detected_img = DIR
+        face_count = len(results[0].boxes.xyxy)
+        detected_img = detected_img.replace("\\", "/")
+        return [detected_img, face_count]
 
 
 if __name__ == "__main__":

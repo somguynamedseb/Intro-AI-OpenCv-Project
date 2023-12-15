@@ -59,12 +59,14 @@ class image_manager:
             return None
 
     def detect_faces(self, imgDIR) -> [str, int]:  # returns DIR of output img
+        model = YOLO('train3/weights/last.pt')
         if isinstance(imgDIR, bytes):
             img = Image.open(BytesIO(imgDIR))
         else:
             img = Image.open(imgDIR)
         results = model.predict(source=img, save=True)  # save plotted images
         d = results[0].save_dir
+        print(str(d))
         DIR = os.path.join(d, (os.listdir(d)[0]))  # error is that there is no image actually saved in the predict file
         self.detected_img = DIR
         self.face_count = len(results[0].boxes.xyxy)
