@@ -16,7 +16,7 @@ def get_input_layout():
     ]
 
     image_viewer_column = [
-        [sg.Text("Post-Scanned Image:", font=('Helvetica', 30), key='-IMGTEXT-')],
+        [sg.Text("Image Being Scanned:", font=('Helvetica', 30), key='-IMGTEXT-')],
         [sg.Text(font=('Helvetica', 10), size=(30, 5), key="-TOUT-")],
         [sg.Image(key="-SCANNED IMAGE-")],]
     # Add a total students scanned and at what confidence rate objects

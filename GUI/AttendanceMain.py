@@ -142,10 +142,10 @@ def main():
                 # LINK TO AI SCAN FUNCTION
                 im.add_image_list(im, stitchImgs)
                 imgBytes = im.stitch_images(im)
-                window["-IMAGE-"].update(data=imgBytes)
+                window["-IMAGE-"].update(data='')
                 readyScanImage = imgBytes
 
-                window[f'-IMGTEXT-'].update("Stitched Image:")
+                window[f'-IMGTEXT-'].update("Successfully Stitched!")
                 window[f'-TOUT-'].update("")
                 window["-SKIP-"].update(visible=False)
                 window[f'-NEXT-'].update(visible=True)
@@ -165,12 +165,12 @@ def main():
                 # if everyone is in the class then num_students and scannedStudents should be equal
                 total_student = num_students - num_exemptions - (num_students - scannedStudents)
                 percentage: int = total_student / num_students * 100
+                rounded_percent = round(percentage, 2)
+                print(str(rounded_percent))
 
                 # scannedImgBytes = find_data_from_dir(sImgDir)
                 window["-SCANNED IMAGE-"].update(data=readyScanImage)
-                window[f'-PERCENTAGE-'].update(str(percentage) + "%")
-                # print("Total Number Of Students In Class: " + str(scannedStudents)
-                #       + " at a " + str(confidenceScan * 100) + " % confidence level.")
+                window[f'-PERCENTAGE-'].update(str(rounded_percent) + "%")
             except:
                 sg.popup_error("Please Enter A Valid Number")
 
@@ -194,18 +194,19 @@ def find_data_from_dir(filename):
     bio.seek(0)
     return bio.read()
 
+
 def detect_faces(imgDIR) -> [str, int]:  # returns DIR of output img
-        model = YOLO('train3/weights/last.pt')
-        if isinstance(imgDIR, bytes):
-            img = Image.open(BytesIO(imgDIR))
-        else:
-            img = Image.open(imgDIR)
-        results = model.predict(source=img, save=True)  # save plotted images
-        result= results[0]
-        detected_img= str(result.save_dir)
-        face_count = len(result.boxes.xyxy)
-        detected_img = detected_img.replace("\\", "/")
-        return [detected_img, face_count]
+    model = YOLO('train3/weights/last.pt')
+    if isinstance(imgDIR, bytes):
+        img = Image.open(BytesIO(imgDIR))
+    else:
+        img = Image.open(imgDIR)
+    results = model.predict(source=img, save=True)  # save plotted images
+    result = results[0]
+    detected_img = str(result.save_dir)
+    face_count = len(result.boxes.xyxy)
+    detected_img = detected_img.replace("\\", "/")
+    return [detected_img, face_count]
 
 
 if __name__ == "__main__":
