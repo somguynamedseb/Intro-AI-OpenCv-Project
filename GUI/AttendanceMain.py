@@ -38,7 +38,6 @@ window.maximize()
 def main():
     stitchImgs = []
     imgClicked = ""
-    scannedStudents = 1
     confidenceScan = 0.60
     maxPages = 3
     page = 1  # The currently visible layout
