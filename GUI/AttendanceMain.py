@@ -12,38 +12,6 @@ import PySimpleGUI as sg
 from io import BytesIO
 from ultralytics import YOLO
 
-import csv
-from datetime import datetime
-import matplotlib.pyplot as plt
-
-
-def save_calculation(num_students, num_exemptions, percentage):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    data = [timestamp, num_students, num_exemptions, percentage]
-    with open('calculations.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(data)
-
-def load_and_graph_data():
-    timestamps = []
-    percentages = []
-    try:
-        with open('calculations.csv', 'r') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                timestamps.append(datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S"))
-                percentages.append(float(row[3]))
-        plt.figure(figsize=(10, 5))
-        plt.plot(timestamps, percentages, marker='o')
-        plt.title('Attendance Percentage Over Time')
-        plt.xlabel('Time')
-        plt.ylabel('Percentage')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.show()
-    except FileNotFoundError:
-        sg.popup_error('No data found. Please perform some calculations first.')
-
 # ----------- Create the 3 layouts this Window will display -----------
 layout1 = home.get_home_layout()
 
@@ -63,7 +31,6 @@ layout = [
      sg.Column(layout2, visible=False, key='-COL2-', vertical_alignment='center', justification='center'),
      sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center'), ],
     [sg.Button('Full Screen', font=('Helvetica', 15), size=10, key='-FSCREEN-')],
-    # [sg.Button('Show Graph', font=('Helvetica', 15), size=10)]
 ]
 
 window = sg.Window('Attendance-AI', layout, finalize=True)
