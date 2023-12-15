@@ -84,8 +84,8 @@ def main():
         # print("PAGE: " + str(page))
         if event in (None, "-EXIT-"):
             break
-        elif event == "Show Graph":
-            load_and_graph_data()
+        elif event == "-FSCREEN-":
+            window.maximize()
         elif event == sg.WIN_CLOSED:
             break
         elif event == "-BACK-":
@@ -202,14 +202,8 @@ def main():
                 percentage: int = total_student / num_students * 100
                 rounded_percent = round(percentage, 2)
                 print(str(rounded_percent))
-
-                # scannedImgBytes = find_data_from_dir(sImgDir)
                 window["-SCANNED IMAGE-"].update(data=readyScanImage)
-                window[f'-PERCENTAGE-'].update(str(percentage) + "%")
-                # print("Total Number Of Students In Class: " + str(scannedStudents)
-                #       + " at a " + str(confidenceScan * 100) + " % confidence level.")
-                save_calculation(num_students, num_exemptions, percentage)
-
+                window[f'-PERCENTAGE-'].update(str(rounded_percent) + "%")
             except:
                 sg.popup_error("Please Enter A Valid Number")
 
