@@ -63,7 +63,7 @@ layout = [
      sg.Column(layout2, visible=False, key='-COL2-', vertical_alignment='center', justification='center'),
      sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center'), ],
     [sg.Button('Full Screen', font=('Helvetica', 15), size=10, key='-FSCREEN-')],
-    [sg.Button('Show Graph', font=('Helvetica', 15), size=10)]
+    # [sg.Button('Show Graph', font=('Helvetica', 15), size=10)]
 ]
 
 window = sg.Window('Attendance-AI', layout, finalize=True)
