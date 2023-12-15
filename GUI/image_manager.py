@@ -7,7 +7,9 @@ import io
 from io import BytesIO
 import datetime
 
-model = YOLO("last.pt")
+
+# model = YOLO('C:\Users\sebas\Documents\GitHub\Intro-AI-OpenCv-Project\GUI\last.pt')
+
 
 
 class image_manager:
@@ -15,9 +17,9 @@ class image_manager:
         self.img_arr = []  # array of images for stitching
         self.detected_img = None  # directory of most recent detected image
         self.face_count = -1  # detected faces
-
-    def add_image(self, imgDIR):
-        self.img_arr = imgDIR
+        self.model = YOLO('train3/weights/last.pt')
+    def add_image(self, imgDIR:str):
+        self.img_arr = [self.img_arr, imgDIR]
 
     def clear_images(self):
         self.img_arr = []
@@ -56,17 +58,19 @@ class image_manager:
             sg.popup_error('Image stitching failed!', 'Error code: ' + str(status))
             return None
 
-    def detect_faces(self, saved_img) -> [str, int]:  # returns DIR of output img
-        if isinstance(saved_img, bytes):
-            img = Image.open(BytesIO(saved_img))
-        else:
-            img = Image.open(saved_img)
-
-        results = model.predict(source=img, save=True)  # save plotted images
+    def detect_faces(self,imgDIR) -> [str, int]:  # returns DIR of output img
+        # if isinstance(saved_img, bytes):
+            # img = Image.open(BytesIO(saved_img))
+        # else:
+            # img = Image.open(saved_img)
+        print(imgDIR)
+        img = Image.open(imgDIR)
+        results = self.model.predict(source=img, save=True)  # save plotted images
         d = results[0].save_dir
         DIR = os.path.join(d, (os.listdir(d)[0]))  # error is that there is no image actually saved in the predict file
         self.detected_img = DIR
         self.face_count = len(results[0].boxes.xyxy)
+        self.detected_img = self.detected_img.replace("\\", "/")
         return [self.detected_img, self.face_count]
 
     def get_face_count(self) -> int:
