@@ -138,7 +138,7 @@ def main():
         elif event == "-STITCH-":
             if len(stitchImgs) >= 2:  # Ensure there are at least two images to stitch
                 # LINK TO AI SCAN FUNCTION
-                im.add_image(im, stitchImgs)
+                im.add_image_list(im, stitchImgs)
                 imgBytes = im.stitch_images(im)
                 window["-IMAGE-"].update(data=imgBytes)
                 readyScanImage = imgBytes
