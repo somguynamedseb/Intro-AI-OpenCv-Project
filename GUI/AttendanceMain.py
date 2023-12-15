@@ -5,6 +5,7 @@ import home
 import img_viewer
 import input_page
 import image_manager
+import data_viewing
 import os.path
 
 import cv2
@@ -17,9 +18,12 @@ layout2 = img_viewer.img_viewer_layout()
 
 layout3 = input_page.get_input_layout()
 
+layout4 = data_viewing.get_data_layout()
+
 # ----------- Create actual layout using Columns and a row of Buttons
 layout = [
     [sg.Button('Exit', font=('Helvetica', 15), size=10, key='-EXIT-')],
+    [sg.Button('Full Screen', font=('Helvetica', 15), size=10, key='-FSCREEN-')],
     [sg.Column([[
         sg.Button('Back', key='-BACK-', font=('Helvetica', 15), size=10),
         sg.Button('Next', key="-NEXT-", font=('Helvetica', 15), size=10), ]],
@@ -27,8 +31,8 @@ layout = [
     [sg.Column([[sg.Text("", size=(0, 5))]], vertical_alignment='center', justification='center')],
     [sg.Column(layout1, visible=True, key='-COL1-', vertical_alignment='center', justification='center'),
      sg.Column(layout2, visible=False, key='-COL2-', vertical_alignment='center', justification='center'),
-     sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center'), ],
-    [sg.Button('Full Screen', font=('Helvetica', 15), size=10, key='-FSCREEN-')],
+     sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center'),
+     sg.Column(layout4, visible=False, key='-COL4-', vertical_alignment='center', justification='center'),],
 ]
 
 window = sg.Window('Attendance-AI', layout, finalize=True)
@@ -40,7 +44,7 @@ def main():
     imgClicked = ""
     scannedStudents = 1
     confidenceScan = 0.60
-    maxPages = 3
+    maxPages = 4
     page = 1  # The currently visible layout
     im = image_manager.image_manager
     readyScanImage: bytes = ""
@@ -52,6 +56,11 @@ def main():
             break
         elif event == sg.WIN_CLOSED:
             break
+        elif event == "-FSCREEN-":
+            try:
+                window.maximize()
+            except:
+                pass
         elif event == "-BACK-":
             if page > 1:
                 window[f'-BACK-'].update(visible=True)
@@ -60,6 +69,8 @@ def main():
                 page -= 1
                 if page == 1:
                     window[f'-BACK-'].update(visible=False)
+                elif page == maxPages-1:
+                    window[f'-DATA-'].update(visible=True)
                 window[f'-COL{page}-'].update(visible=True)
         elif event == "-NEXT-":
             if 0 < page < maxPages:
@@ -125,7 +136,7 @@ def main():
             # possibly make a delete function for added stitched imgs
         elif event == "-SKIP-":
             window[f'-COL{page}-'].update(visible=False)
-            page = maxPages
+            page += 1
             window[f'-COL{page}-'].update(visible=True)
             window[f'-NEXT-'].update(visible=False)
 
@@ -170,8 +181,20 @@ def main():
                 window[f'-PERCENTAGE-'].update(str(percentage) + "%")
                 print("Total Number Of Students In Class: " + str(scannedStudents)
                       + " at a " + str(confidenceScan * 100) + " % confidence level.")
+                window[f'-NEXT-'].update(visible=True)
             except:
                 sg.popup_error("Please Enter A Valid Number")
+        elif event == "-DATA-":
+            window[f'-COL{page}-'].update(visible=False)
+            page += 1
+            window[f'-COL{page}-'].update(visible=True)
+            window[f'-NEXT-'].update(visible=False)
+            window[f'-DATA-'].update(visible=False)
+
+            lines = 7
+            for x in range(lines):
+                x *= 200/lines
+                window[f'-GRAPH-'].draw_line((x, 0), (x, 700), color='black')
 
     window.close()
 

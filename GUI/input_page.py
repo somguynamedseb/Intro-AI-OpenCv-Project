@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 
 
 def get_input_layout():
+
     inputs = [
         [sg.Text("Total Number Of Students", font=('Helvetica', 30))],
         [sg.Input("0", key='-NUM STUDENTS-', font=('Helvetica', 15), size=15, pad=(150, 0))],
@@ -12,9 +13,10 @@ def get_input_layout():
         [sg.Button("Calculate", font=('Helvetica', 15), size=15, pad=(150, 0), key="-CALCULATE-")],
         [sg.Text("", size=(0, 1))],
         [sg.Text("00.00%", background_color='navyblue', text_color='white', key='-PERCENTAGE-', font=('Helvetica', 15),
-                 size=8, pad=(190, 0), justification='center')]
+                 size=8, pad=(190, 0), justification='center')],
+        [sg.Text("", size=(0, 1))],
+        [sg.Button("View Data", font=('Helvetica', 15), size=15, pad=(150, 0), key="-DATA-", visible=True)],
     ]
-
     image_viewer_column = [
         [sg.Text("Post-Scanned Image:", font=('Helvetica', 30), key='-IMGTEXT-')],
         [sg.Text(font=('Helvetica', 10), size=(30, 5), key="-TOUT-")],
