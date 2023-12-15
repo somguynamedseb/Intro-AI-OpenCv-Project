@@ -171,6 +171,7 @@ def main():
                 print(str(rounded_percent))
                 window["-SCANNED IMAGE-"].update(data=readyScanImage)
                 window[f'-PERCENTAGE-'].update(str(rounded_percent) + "%")
+            #     
             except:
                 sg.popup_error("Please Enter A Valid Number")
 
