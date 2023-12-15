@@ -2,6 +2,10 @@
 from PIL import Image, ImageTk
 import io
 
+import csv
+from datetime import datetime
+import matplotlib.pyplot as plt
+
 
 import home
 import img_viewer
@@ -34,11 +38,42 @@ layout = [
     [sg.Column(layout1, visible=True, key='-COL1-', vertical_alignment='center', justification='center'),
      sg.Column(layout2, visible=False, key='-COL2-', vertical_alignment='center', justification='center'),
      sg.Column(layout3, visible=False, key='-COL3-', vertical_alignment='center', justification='center'),],
+    [sg.Button('Show Graph', font=('Helvetica', 15), size=10)]
+
 ]
 
 window = sg.Window('Attendance-AI', layout, finalize=True)
 window.maximize()
 
+
+
+
+def save_calculation(num_students, num_exemptions, percentage):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    data = [timestamp, num_students, num_exemptions, percentage]
+    with open('calculations.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(data)
+
+def load_and_graph_data():
+    timestamps = []
+    percentages = []
+    try:
+        with open('calculations.csv', 'r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                timestamps.append(datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S"))
+                percentages.append(float(row[3]))
+        plt.figure(figsize=(10, 5))
+        plt.plot(timestamps, percentages, marker='o')
+        plt.title('Attendance Percentage Over Time')
+        plt.xlabel('Time')
+        plt.ylabel('Percentage')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
+    except FileNotFoundError:
+        sg.popup_error('No data found. Please perform some calculations first.')
 
 # home.windowUpdate(window)
 
@@ -54,6 +89,9 @@ def main():
             break
         if event == sg.WIN_CLOSED:
             break
+
+        if event == "Show Graph":
+            load_and_graph_data()
 
         if event == "-BACK-":
             if page > 1:
@@ -173,6 +211,7 @@ def main():
             total_student = num_students - num_exemptions
             percentage = total_student/num_students*100
             window[f'-PERCENTAGE-'].update(str(percentage)+"%")
+            save_calculation(num_students, num_exemptions, percentage)
             print("Total Number Of Students In Class: " + str(total_student))
 
     window.close()
