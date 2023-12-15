@@ -208,9 +208,10 @@ def main():
                 window[f'-PERCENTAGE-'].update(str(percentage) + "%")
                 # print("Total Number Of Students In Class: " + str(scannedStudents)
                 #       + " at a " + str(confidenceScan * 100) + " % confidence level.")
+                save_calculation(num_students, num_exemptions, percentage)
+
             except:
                 sg.popup_error("Please Enter A Valid Number")
-                save_calculation(num_students, num_exemptions, percentage)
 
     window.close()
 
